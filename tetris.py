@@ -98,7 +98,8 @@ class Tetris:
       agg_height = sum(self.heights(board))
       holes = self.hole_count(board)
       bumpy_score = self.bumpiness(board)
-      return tf.constant([line_count, holes, bumpy_score, agg_height])
+      return np.array([line_count, holes, bumpy_score, agg_height])
+      # return tf.constant([line_count, holes, bumpy_score, agg_height])
       
    '''
       Checking if ndarray in each row contains a 0. If so we want to remove it from our board.
@@ -201,6 +202,7 @@ class Tetris:
             board = self.store(tetromino, pos)
             states[(x, i)] = self.state_properties(board)
          current_tetromino = self.rotate(current_tetromino)
+      return states
 
    def current_board_state(self):
       board = deepcopy(self.board)
