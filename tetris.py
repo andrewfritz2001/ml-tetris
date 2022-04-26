@@ -1,8 +1,5 @@
-from tarfile import BLOCKSIZE
-from turtle import width
 import cv2
 import random
-from matplotlib.widgets import Widget
 import numpy as np
 import tensorflow as tf
 from PIL import Image
