@@ -282,7 +282,18 @@ class Tetris:
       else:
          self.new_piece()
       
-      return (self.next_states(), line_count**2, self.gameover)
+      reward = 0
+
+      if line_count == 1:
+         reward = 10
+      elif line_count == 2:
+         reward = 30
+      elif line_count == 3:
+         reward = 50
+      elif line_count == 4:
+         reward = 80
+
+      return (self.next_states(), reward, self.gameover)
       # return score, self.gameover
 
    def render(self, video=None):
