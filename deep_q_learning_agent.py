@@ -20,16 +20,21 @@ MIN_EPSILON = 0.0005 # we always want at least a little bit of randomness
 """
 class ExperienceLog:
     def __init__(self, buffer_size=10000):
-        self.buffer = []
+        self.buffer = [None] * buffer_size
         self.buffer_size = buffer_size
+        self.insert_pos = 0
 
     def add(self, experience):
-        if len(self.buffer) + len(experience) >= self.buffer_size:
-            self.buffer[0:len(experience)-(self.buffer_size-len(self.buffer))] = []
-        self.buffer.extend(experience)
+        if self.insert_pos >= self.buffer_size:
+            self.insert_pos = 0
+        self.buffer[0] = experience
+        self.insert_pos += 1
 
     def sample(self, size):
         return random.sample(self.buffer,size)
+    
+    def size(self):
+        return len([x for x in self.buffer if x])
 
 
 """
@@ -97,7 +102,7 @@ class DeepQLearningAgent:
     def learn(self, batch_size=500, epochs=1):
         
         # not enough samples yet to learn
-        if len(self.experience_log) < batch_size:
+        if self.experience_log.size() < batch_size:
             return
         
         experiences = self.experience_log.sample(batch_size)

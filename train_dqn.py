@@ -4,15 +4,7 @@ import numpy as np
 from tetris import Tetris
 from deep_q_learning_agent import DeepQLearningAgent
 
-EPISODES = 10
-
-"""
-    TODO:
-    Anytime env.some_func() is called, we need to make sure that the
-    game engine is giving the neural network the correct inputs
-    Then, we should be ok, but hard to tell at the moment.
-"""
-
+EPISODES = 250
 
 def train():
     env = Tetris()
@@ -29,14 +21,23 @@ def train():
         steps = 0 
 
         for _ in range(EPISODES):
-            game_state = env.reset()
+            env.reset()
+            game_state = env.next_states()
             prev_state = None
             done = False
             total_reward = 0
             while not done:
+                print(game_state)
+                # must give act() a list of tuples like (action,state)
+                # game state looks like this: (x-pos,rots):[bumpiness,holes,etc] ]
                 action, state = model.act(game_state)
-                game_state, reward, done, info = env.step(action)
-                model.experiences.add((prev_state, reward, state, done))
+
+                # give step() an action in the form (x-pos,numrotations)
+                # step returns a state 
+                game_state, reward, done = env.step(action)
+                
+                
+                model.experience_log.add((prev_state, reward, state, done))
                 prev_state = state
                 steps += 1
                 total_reward += reward

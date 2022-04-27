@@ -1,3 +1,4 @@
+from hashlib import new
 import cv2
 import random
 import numpy as np
@@ -202,7 +203,7 @@ class Tetris:
             board = self.store(tetromino, pos)
             states[(x, i)] = self.state_properties(board)
          current_tetromino = self.rotate(current_tetromino)
-      return states
+      return [(x[0],x[1]) for x in states.items()] # {k:p} -> [(k,p)]
 
    def current_board_state(self):
       board = deepcopy(self.board)
@@ -275,9 +276,14 @@ class Tetris:
       self.score += score
       self.count += 1
       self.lines += line_count
+      
       if self.gameover:
          self.score -= 2
-      return score, self.gameover
+      else:
+         self.new_piece()
+      
+      return (self.next_states(), line_count**2, self.gameover)
+      # return score, self.gameover
 
    def render(self, video=None):
       if not self.gameover:
