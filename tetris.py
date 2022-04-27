@@ -193,7 +193,7 @@ class Tetris:
       current_tetromino = deepcopy(self.tetromino)
       rotations = self.avaliable_rotations()
       for i in range(rotations):
-         valid_positions = WITDH - len(current_tetromino[0])
+         valid_positions = WITDH - len(current_tetromino[0]) + 1
          for x in range(valid_positions):
             tetromino = deepcopy(current_tetromino)
             pos= {'x': x, 'y': 0}

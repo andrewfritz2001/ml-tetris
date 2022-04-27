@@ -9,7 +9,7 @@ import random
     Hyperparameters for training
 """
 DISCOUNT_RATE = 1
-EPSILON = 0.5
+EPSILON = 0.05
 DECAY = 0.99
 MIN_EPSILON = 0.0005 # we always want at least a little bit of randomness
 
