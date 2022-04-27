@@ -9,8 +9,8 @@ import random
     Hyperparameters for training
 """
 DISCOUNT_RATE = 1
-EPSILON = 1
-DECAY = 9.999
+EPSILON = 0.5
+DECAY = 0.99
 MIN_EPSILON = 0.0005 # we always want at least a little bit of randomness
 
 
@@ -41,8 +41,7 @@ class ExperienceLog:
     The Deep-Q-Learning agent we will be using to play tetris
 """
 class DeepQLearningAgent:
-    def __init__(self, state_size=200):  
-
+    def __init__(self, state_size=4):  
         self.state_size = state_size    
         self.discount_rate =   DISCOUNT_RATE
         self.epsilon = EPSILON
