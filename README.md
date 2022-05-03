@@ -10,5 +10,4 @@ The goal of this project is use reinforcement learning create a model to learn h
 
 Presentation Link: https://youtu.be/Hiwujt6hYgQ \
 Presentation Slides: https://docs.google.com/presentation/d/1NnfTJ4u9F9NaK_y96RtVvak6oLk31bX2C_I7Ubj3rEw/edit?usp=sharing \
-Code Demo: https://youtu.be/eZSdNtTqULc \
-Repo: https://github.com/andrewfritz2001/ml-tetris \
+Code Demo: https://youtu.be/eZSdNtTqULc
