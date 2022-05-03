@@ -27,14 +27,19 @@ class ExperienceLog:
     def add(self, experience):
         if self.insert_pos >= self.buffer_size:
             self.insert_pos = 0
-        self.buffer[0] = experience
+        self.buffer[self.insert_pos] = experience
         self.insert_pos += 1
 
     def sample(self, size):
-        return random.sample(self.buffer,size)
+        return random.sample(self.buffer[0:self.size()],size)
     
     def size(self):
-        return len([x for x in self.buffer if x])
+        sum = 0
+        for i in self.buffer:
+            if i:
+                sum += 1
+        return sum
+
 
 
 """
@@ -99,13 +104,12 @@ class DeepQLearningAgent:
         and used to train the neural network
     """
     def learn(self, batch_size=500, epochs=1):
-        
         # not enough samples yet to learn
         if self.experience_log.size() < batch_size:
             return
-        
+
         experiences = self.experience_log.sample(batch_size)
-        
+        print(experiences)
         x = []
         y = []
 
@@ -122,3 +126,4 @@ class DeepQLearningAgent:
 
         self.model.fit(np.array(x), np.array(y), batch_size=len(x), verbose=0, epochs=epochs) # ,callbacks=[self.tensorboard]
         self.epsilon = max(self.min_epsilon, self.epsilon * self.decay)
+        print(self.epsilon)
