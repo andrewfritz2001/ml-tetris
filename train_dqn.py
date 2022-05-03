@@ -14,7 +14,7 @@ from deep_q_learning_agent import DeepQLearningAgent
 
 import timeit
 
-EPISODES = 25
+EPISODES = 15
 
 def train():
     env = Tetris()

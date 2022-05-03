@@ -186,8 +186,6 @@ class Tetris:
       else:
          return 1
 
-   #TODO: Implement game logic and rendering
-
    def next_states(self):
       states = {}
       current_tetromino = deepcopy(self.tetromino)
@@ -259,6 +257,15 @@ class Tetris:
                board[y + pos["y"]][x + pos["x"]] = tetromino[y][x]
       return board
 
+
+   def compute_reward(self, lines, holes, height, bumpiness, gameover):
+      # Parameters for the reward function
+      a = -0.5
+      b = -0.35
+      c = -0.2
+      # print([lines, holes, height, bumpiness])
+      return -4 if gameover else (a*height)+lines**2+(b*holes)+(c*bumpiness) 
+
    def step(self, action, render=True, video=None):
       x, rotations = action
       self.current_pos = {'x': x, 'y': 0}
@@ -281,17 +288,16 @@ class Tetris:
          self.score -= 2
       else:
          self.new_piece()
-      
-      reward = 0
 
-      if line_count == 1:
-         reward = 10
-      elif line_count == 2:
-         reward = 30
-      elif line_count == 3:
-         reward = 50
-      elif line_count == 4:
-         reward = 80
+      reward = self.compute_reward(
+         self.lines, 
+         self.hole_count(self.board), 
+         sum(self.heights(self.board)), 
+         self.bumpiness(self.board),
+         self.gameover
+         )
+
+      # print(reward)
 
       return (self.next_states(), reward, self.gameover)
       # return score, self.gameover
