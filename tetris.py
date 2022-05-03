@@ -1,8 +1,6 @@
-from tarfile import BLOCKSIZE
-from turtle import width
+from hashlib import new
 import cv2
 import random
-from matplotlib.widgets import Widget
 import numpy as np
 import tensorflow as tf
 from PIL import Image
@@ -101,7 +99,8 @@ class Tetris:
       agg_height = sum(self.heights(board))
       holes = self.hole_count(board)
       bumpy_score = self.bumpiness(board)
-      return tf.constant([line_count, holes, bumpy_score, agg_height])
+      return np.array([line_count, holes, bumpy_score, agg_height])
+      # return tf.constant([line_count, holes, bumpy_score, agg_height])
       
    '''
       Checking if ndarray in each row contains a 0. If so we want to remove it from our board.
@@ -187,14 +186,12 @@ class Tetris:
       else:
          return 1
 
-   #TODO: Implement game logic and rendering
-
    def next_states(self):
       states = {}
       current_tetromino = deepcopy(self.tetromino)
       rotations = self.avaliable_rotations()
       for i in range(rotations):
-         valid_positions = WITDH - len(current_tetromino[0])
+         valid_positions = WITDH - len(current_tetromino[0]) + 1
          for x in range(valid_positions):
             tetromino = deepcopy(current_tetromino)
             pos= {'x': x, 'y': 0}
@@ -204,6 +201,7 @@ class Tetris:
             board = self.store(tetromino, pos)
             states[(x, i)] = self.state_properties(board)
          current_tetromino = self.rotate(current_tetromino)
+      return [(x[0],x[1]) for x in states.items()] # {k:p} -> [(k,p)]
 
    def current_board_state(self):
       board = deepcopy(self.board)
@@ -259,6 +257,15 @@ class Tetris:
                board[y + pos["y"]][x + pos["x"]] = tetromino[y][x]
       return board
 
+
+   def compute_reward(self, lines, holes, height, bumpiness, gameover):
+      # Parameters for the reward function
+      a = -0.5
+      b = -0.35
+      c = -0.2
+      # print([lines, holes, height, bumpiness])
+      return -4 if gameover else (a*height)+lines**2+(b*holes)+(c*bumpiness) 
+
    def step(self, action, render=True, video=None):
       x, rotations = action
       self.current_pos = {'x': x, 'y': 0}
@@ -276,9 +283,24 @@ class Tetris:
       self.score += score
       self.count += 1
       self.lines += line_count
+      
       if self.gameover:
          self.score -= 2
-      return score, self.gameover
+      else:
+         self.new_piece()
+
+      reward = self.compute_reward(
+         self.lines, 
+         self.hole_count(self.board), 
+         sum(self.heights(self.board)), 
+         self.bumpiness(self.board),
+         self.gameover
+         )
+
+      # print(reward)
+
+      return (self.next_states(), reward, self.gameover)
+      # return score, self.gameover
 
    def render(self, video=None):
       if not self.gameover:
