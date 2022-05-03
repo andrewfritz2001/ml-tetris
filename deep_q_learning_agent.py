@@ -20,16 +20,19 @@ MIN_EPSILON = 0.0005 # we always want at least a little bit of randomness
 """
 class ExperienceLog:
     def __init__(self, buffer_size=10000):
-        self.buffer = [None] * buffer_size
+        self.buffer = []
         self.buffer_size = buffer_size
         self.insert_pos = 0
 
     def add(self, experience):
         if self.insert_pos >= self.buffer_size:
-            self.insert_pos = 0
-        self.buffer[self.insert_pos] = experience
-        self.insert_pos += 1
-
+                self.insert_pos = 0
+        if len(self.buffer) != self.buffer_size:
+            self.buffer.append(experience)
+        else:
+            self.buffer[self.insert_pos] = experience
+            self.insert_pos += 1
+        
     def sample(self, size):
         return random.sample(self.buffer[0:self.size()],size)
     
@@ -53,6 +56,11 @@ class DeepQLearningAgent:
         self.min_epsilon = MIN_EPSILON
         self.decay = DECAY
         self.experience_log = ExperienceLog()
+        self.tensorboard = tf.keras.callbacks.TensorBoard(log_dir="./bin",
+                                                          histogram_freq=1000,
+                                                          write_graph=True,
+                                                          write_images=True)
+
         self.model = keras.Sequential([
                 layers.Dense(64, activation="relu", input_dim=self.state_size),
                 layers.Dense(64, activation="relu"),
@@ -107,9 +115,9 @@ class DeepQLearningAgent:
         # not enough samples yet to learn
         if self.experience_log.size() < batch_size:
             return
-
+            
         experiences = self.experience_log.sample(batch_size)
-        print(experiences)
+        
         x = []
         y = []
 
@@ -124,6 +132,11 @@ class DeepQLearningAgent:
             x.append(prev_state)
             y.append(q)
 
-        self.model.fit(np.array(x), np.array(y), batch_size=len(x), verbose=0, epochs=epochs) # ,callbacks=[self.tensorboard]
+        self.model.fit(x=np.array(x), 
+                y=np.array(y), 
+                batch_size=len(x), 
+                epochs=epochs, 
+                verbose=0, 
+                callbacks=[self.tensorboard])
+
         self.epsilon = max(self.min_epsilon, self.epsilon * self.decay)
-        print(self.epsilon)

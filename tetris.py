@@ -297,10 +297,7 @@ class Tetris:
          self.gameover
          )
 
-      # print(reward)
-
       return (self.next_states(), reward, self.gameover)
-      # return score, self.gameover
 
    def render(self, video=None):
       if not self.gameover:

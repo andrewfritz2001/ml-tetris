@@ -14,7 +14,7 @@ from deep_q_learning_agent import DeepQLearningAgent
 
 import timeit
 
-EPISODES = 15
+EPISODES = 25
 
 def train():
     env = Tetris()
@@ -47,8 +47,9 @@ def train():
                 # step returns a state 
                 game_state, reward, done = env.step(action)
                 
-                
-                model.experience_log.add((prev_state, reward, state, done))
+                if prev_state is not None:
+                    model.experience_log.add((prev_state, reward, state, done))
+    
                 prev_state = state
                 steps += 1
                 total_reward += reward
